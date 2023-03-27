@@ -1,6 +1,9 @@
 # 🌿 SpringResize
 
-SpringResize is a Spring Boot REST API project that allows you to easily resize images. The application is designed to be highly scalable and leverages various AWS services and Terraform for infrastructure management. It also includes detailed API documentation using Springdoc, as well as separate main and development stages with workflows for smooth deployment.
+SpringResize is a Spring Boot REST API project that allows you to easily resize images. The application is designed to
+be highly scalable and leverages various AWS services and Terraform for infrastructure management. It also includes
+detailed API documentation using Springdoc, as well as separate main and development stages with workflows for smooth
+deployment.
 
 ## 🌟 Features
 
@@ -14,6 +17,10 @@ SpringResize is a Spring Boot REST API project that allows you to easily resize 
 - 🚦 Separate main and development stages
 - 🔄 Automated deployment workflows
 - 🐳 Docker containerization for consistent environment management
+
+## Architecture
+
+![Architecture](https://github.com/firattamur/spring-resize/blob/develop/.github/assets/architecture.png)
 
 ## 🔧 Prerequisites
 
