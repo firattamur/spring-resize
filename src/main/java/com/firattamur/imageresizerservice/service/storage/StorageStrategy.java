@@ -2,7 +2,7 @@ package com.firattamur.imageresizerservice.service.storage;
 
 import java.awt.image.BufferedImage;
 
-public interface StorageHandler {
+public interface StorageStrategy {
 
     /**
      * Uploads an image to the storage
@@ -11,7 +11,7 @@ public interface StorageHandler {
      * @param image
      * @return url of the uploaded image
      */
-    String uploadImage(String key, BufferedImage image);
+    String uploadImage(String key, BufferedImage image) throws Exception;
 
     /**
      * Downloads an image from the storage

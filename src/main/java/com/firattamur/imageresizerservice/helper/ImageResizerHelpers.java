@@ -62,7 +62,22 @@ public class ImageResizerHelpers {
 
         String[] imageType = base64Image.split(";");
         return imageType[0].split("/")[1];
-        
+
+    }
+
+    /**
+     * This method converts the BufferedImage object to a byte array.
+     *
+     * @param image : The image to be converted.
+     * @return: The image as a byte array.
+     */
+    public static byte[] convertImageToByteArray(BufferedImage image, String imageType) throws Exception {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, imageType, outputStream);
+
+        return outputStream.toByteArray();
+
     }
 
 }

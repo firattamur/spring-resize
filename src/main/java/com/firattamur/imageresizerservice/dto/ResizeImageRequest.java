@@ -12,9 +12,9 @@ public class ResizeImageRequest {
     private String image;
 
     @NotEmpty
-    private String width;
+    private int width;
 
     @NotEmpty
-    private String height;
+    private int height;
 
 }
