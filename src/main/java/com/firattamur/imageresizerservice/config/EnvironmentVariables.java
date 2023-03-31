@@ -2,7 +2,7 @@ package com.firattamur.imageresizerservice.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class EnvVariables {
+public class EnvironmentVariables {
 
     public static final String AWS_REGION;
     public static final String AWS_SECRET_KEY;

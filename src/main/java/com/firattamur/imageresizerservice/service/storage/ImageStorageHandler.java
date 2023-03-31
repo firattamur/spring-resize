@@ -15,7 +15,7 @@ public class ImageStorageHandler {
     }
 
     public BufferedImage download(String key) {
-        return storageStrategy.download(key);
+        return (BufferedImage) storageStrategy.download(key);
     }
 
     public Boolean delete(String key) {

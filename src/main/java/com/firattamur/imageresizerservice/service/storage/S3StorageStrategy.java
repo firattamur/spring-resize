@@ -1,7 +1,7 @@
 package com.firattamur.imageresizerservice.service.storage;
 
 import com.firattamur.imageresizerservice.config.DependencyFactory;
-import com.firattamur.imageresizerservice.config.EnvVariables;
+import com.firattamur.imageresizerservice.config.EnvironmentVariables;
 import com.firattamur.imageresizerservice.helper.ImageResizerHelpers;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.SdkBytes;
@@ -13,10 +13,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import java.awt.image.BufferedImage;
 
 @Component
-public class S3StorageStrategy implements StorageStrategy {
+public class S3StorageStrategy implements StorageStrategy<BufferedImage> {
 
     private final S3Client s3Client = DependencyFactory.getInstance().getS3Client();
-    private final String bucketName = EnvVariables.AWS_S3_BUCKET_NAME;
+    private final String bucketName = EnvironmentVariables.AWS_S3_BUCKET_NAME;
 
     @Override
     public String uploadImage(String key, BufferedImage image) throws Exception {
@@ -32,7 +32,6 @@ public class S3StorageStrategy implements StorageStrategy {
                 .build();
 
         PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageBytes));
-        s3Client.close();
 
         String url = String.format("https://%s.s3.amazonaws.com/%s", bucketName, key);
 

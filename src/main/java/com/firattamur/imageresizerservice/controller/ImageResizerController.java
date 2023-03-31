@@ -4,9 +4,7 @@ import com.firattamur.imageresizerservice.dto.ResizeImageRequest;
 import com.firattamur.imageresizerservice.dto.ResizeImageResponse;
 import com.firattamur.imageresizerservice.service.ImageResizerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,9 +29,10 @@ public class ImageResizerController {
      * @return ResponseEntity<ResizeImageResponse>
      */
     @PostMapping("/resize")
-    public ResponseEntity<ResizeImageResponse> resizeImage(@RequestBody ResizeImageRequest resizeImageRequest) {
+    public ResizeImageResponse resizeImage(ResizeImageRequest resizeImageRequest) {
 
-        return null;
+        return this.imageResizerService.resizeImage(resizeImageRequest);
+
     }
 
 }

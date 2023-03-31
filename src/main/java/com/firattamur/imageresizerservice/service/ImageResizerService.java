@@ -1,11 +1,14 @@
 package com.firattamur.imageresizerservice.service;
 
+import com.firattamur.imageresizerservice.dto.ResizeImageRequest;
+import com.firattamur.imageresizerservice.dto.ResizeImageResponse;
 import com.firattamur.imageresizerservice.helper.ImageResizerHelpers;
 import com.firattamur.imageresizerservice.service.storage.StorageStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
+import java.util.UUID;
 
 @Service
 public class ImageResizerService {
@@ -26,10 +29,35 @@ public class ImageResizerService {
      * @param image
      * @return ResponseEntity<ResizeImageResponse>
      */
-    public String resizeImage(BufferedImage image, int width, int height) {
+    public ResizeImageResponse resizeImage(ResizeImageRequest resizeImageRequest) {
 
-        BufferedImage resizedImage = ImageResizerHelpers.resizeImage(image, width, height);
+        try {
 
+            BufferedImage image = ImageResizerHelpers.decodeBase64ToImage(resizeImageRequest.getImage());
+            int width = resizeImageRequest.getWidth();
+            int height = resizeImageRequest.getHeight();
+
+            BufferedImage resizedImage = ImageResizerHelpers.resizeImage(image, width, height);
+
+            UUID uuid = UUID.randomUUID();
+            String key = uuid.toString();
+
+            String resizedImageUrl = storageHandler.uploadImage(String.format("%s-resized", key), resizedImage);
+            String originalImageUrl = storageHandler.uploadImage(String.format("%s-original", key), image);
+
+            // TODO: Store metadata of image in DynamoDB
+
+            return new ResizeImageResponse(resizedImageUrl, originalImageUrl);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            // TODO - Handle exception properly
+
+            return null;
+
+        }
 
     }
 

@@ -1,8 +1,6 @@
 package com.firattamur.imageresizerservice.service.storage;
 
-import java.awt.image.BufferedImage;
-
-public interface StorageStrategy {
+public interface StorageStrategy<T> {
 
     /**
      * Uploads an image to the storage
@@ -11,7 +9,7 @@ public interface StorageStrategy {
      * @param image
      * @return url of the uploaded image
      */
-    String uploadImage(String key, BufferedImage image) throws Exception;
+    String uploadImage(String key, T image) throws Exception;
 
     /**
      * Downloads an image from the storage
@@ -19,7 +17,7 @@ public interface StorageStrategy {
      * @param key
      * @return image as BufferedImage
      */
-    BufferedImage download(String key);
+    T download(String key);
 
     /**
      * Deletes an image from the storage
