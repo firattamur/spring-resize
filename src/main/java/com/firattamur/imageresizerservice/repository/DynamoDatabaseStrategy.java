@@ -1,7 +1,6 @@
 package com.firattamur.imageresizerservice.repository;
 
 import com.firattamur.imageresizerservice.entity.ImageDynamoDBEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
@@ -14,47 +13,45 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
-public class DynamoDatabaseStrategy implements DatabaseStrategy<ImageDynamoDBEntity> {
+public class DynamoDatabaseStrategy<T> implements DatabaseStrategy<T> {
 
     private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
+    private final Class<T> entityClass;
 
-    @Autowired
-    public DynamoDatabaseStrategy(DynamoDbEnhancedClient dynamoDbEnhancedClient) {
+    public DynamoDatabaseStrategy(DynamoDbEnhancedClient dynamoDbEnhancedClient, Class<T> entityClass) {
         this.dynamoDbEnhancedClient = dynamoDbEnhancedClient;
+        this.entityClass = entityClass;
     }
 
     @Override
-    public void createRecord(ImageDynamoDBEntity record) {
+    public void createRecord(T record) {
         getDynamoDbTable().putItem(record);
     }
 
     @Override
-    public void updateRecord(ImageDynamoDBEntity record) {
+    public void updateRecord(T record) {
         getDynamoDbTable().updateItem(record);
     }
 
     @Override
-    public void deleteRecord(ImageDynamoDBEntity record) {
-        Key key = Key.builder().partitionValue(record.getId()).build();
+    public void deleteRecord(T record) {
+        Key key = Key.builder().partitionValue(getId(record)).build();
         getDynamoDbTable().deleteItem(key);
     }
 
     @Override
-    public ImageDynamoDBEntity getRecordById(String id) {
+    public T getRecordById(String id) {
         Key key = Key.builder().partitionValue(id).build();
         return getDynamoDbTable().getItem(key);
     }
 
     @Override
-    public List<ImageDynamoDBEntity> getAllRecords() {
-
-        List<ImageDynamoDBEntity> imageDynamoDBEntities = getDynamoDbTable().scan().items().stream().toList();
-        return imageDynamoDBEntities;
-
+    public List<T> getAllRecords() {
+        return getDynamoDbTable().scan().items().stream().toList();
     }
 
     @Override
-    public List<ImageDynamoDBEntity> getRecordsByQuery(Map<String, String> queryMap) {
+    public List<T> getRecordsByQuery(Map<String, String> queryMap) {
 
         if (queryMap == null || queryMap.isEmpty()) {
             return getAllRecords();
@@ -119,11 +116,21 @@ public class DynamoDatabaseStrategy implements DatabaseStrategy<ImageDynamoDBEnt
         // DynamoDB does not require connection to be closed
     }
 
-    private DynamoDbTable<ImageDynamoDBEntity> getDynamoDbTable() {
+    private DynamoDbTable<T> getDynamoDbTable() {
 
-        DynamoDbTable<ImageDynamoDBEntity> dynamoDbTable = dynamoDbEnhancedClient.table("ImageDynamoDBEntity",
-                TableSchema.fromBean(ImageDynamoDBEntity.class));
+        DynamoDbTable<T> dynamoDbTable = dynamoDbEnhancedClient.table(this.entityClass.getSimpleName(),
+                TableSchema.fromBean(this.entityClass));
         return dynamoDbTable;
+
+    }
+
+    private String getId(T record) {
+
+        if (record instanceof ImageDynamoDBEntity) {
+            return ((ImageDynamoDBEntity) record).getId();
+        } else {
+            throw new IllegalArgumentException("Record type is not supported");
+        }
 
     }
 
