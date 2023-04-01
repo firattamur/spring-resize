@@ -29,7 +29,7 @@ public class ImageResizerController {
      * @return ResponseEntity<ResizeImageResponse>
      */
     @PostMapping("/resize")
-    public ResizeImageResponse resizeImage(ResizeImageRequest resizeImageRequest) {
+    public ResizeImageResponse resizeImage(ResizeImageRequest resizeImageRequest) throws Exception {
 
         return this.imageResizerService.resizeImage(resizeImageRequest);
 

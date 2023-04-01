@@ -1,6 +1,8 @@
 package com.firattamur.imageresizerservice.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +11,16 @@ import lombok.Setter;
 public class ResizeImageRequest {
 
     @NotEmpty
+    @NotBlank
     private String image;
 
     @NotEmpty
+    @NotBlank
+    @Size(min = 32, max = 3096)
     private int width;
 
     @NotEmpty
+    @Size(min = 32, max = 3096)
     private int height;
 
 }

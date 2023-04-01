@@ -2,6 +2,8 @@ package com.firattamur.imageresizerservice.service;
 
 import com.firattamur.imageresizerservice.dto.ResizeImageRequest;
 import com.firattamur.imageresizerservice.dto.ResizeImageResponse;
+import com.firattamur.imageresizerservice.exception.InvalidImageDimensionsException;
+import com.firattamur.imageresizerservice.exception.InvalidImageFormatException;
 import com.firattamur.imageresizerservice.helper.ImageResizerHelpers;
 import com.firattamur.imageresizerservice.service.storage.StorageStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,10 @@ import java.util.UUID;
 @Service
 public class ImageResizerService {
 
-    private final StorageStrategy storageHandler;
+    private final StorageStrategy<BufferedImage> storageHandler;
 
     @Autowired
-    public ImageResizerService(StorageStrategy storageHandler) {
+    public ImageResizerService(StorageStrategy<BufferedImage> storageHandler) {
         this.storageHandler = storageHandler;
     }
 
@@ -29,15 +31,18 @@ public class ImageResizerService {
      * @param image
      * @return ResponseEntity<ResizeImageResponse>
      */
-    public ResizeImageResponse resizeImage(ResizeImageRequest resizeImageRequest) {
+    public ResizeImageResponse resizeImage(ResizeImageRequest resizeImageRequest) throws Exception {
 
         try {
 
-            BufferedImage image = ImageResizerHelpers.decodeBase64ToImage(resizeImageRequest.getImage());
+            BufferedImage image = ImageResizerHelpers.decodeBase64ToImage(resizeImageRequest.getImage())
+                    .orElseThrow(() -> new InvalidImageFormatException("Invalid image format in request body."));
+
             int width = resizeImageRequest.getWidth();
             int height = resizeImageRequest.getHeight();
 
-            BufferedImage resizedImage = ImageResizerHelpers.resizeImage(image, width, height);
+            BufferedImage resizedImage = ImageResizerHelpers.resizeImage(image, width, height)
+                    .orElseThrow(() -> new InvalidImageDimensionsException("Invalid image dimensions in request body."));
 
             UUID uuid = UUID.randomUUID();
             String key = uuid.toString();
@@ -51,11 +56,7 @@ public class ImageResizerService {
 
         } catch (Exception e) {
 
-            e.printStackTrace();
-
-            // TODO - Handle exception properly
-
-            return null;
+            throw e;
 
         }
 

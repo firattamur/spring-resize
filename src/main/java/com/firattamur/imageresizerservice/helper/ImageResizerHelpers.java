@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
+import java.util.Optional;
 
 public class ImageResizerHelpers {
 
@@ -18,20 +19,20 @@ public class ImageResizerHelpers {
      * @param height:        The height of the resized image.
      * @return: The resized image as a BufferedImage object.
      */
-    public static BufferedImage resizeImage(BufferedImage originalImage, int width, int height) throws Exception {
+    public static Optional<BufferedImage> resizeImage(BufferedImage originalImage, int width, int height) {
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
 
-        Thumbnails.of(originalImage)
-                .size(width, height)
-                .outputFormat("JPEG")
-                .outputQuality(1)
-                .toOutputStream(outputStream);
+            return Optional.of(Thumbnails.of(originalImage)
+                    .size(width, height)
+                    .asBufferedImage());
 
-        byte[] data = outputStream.toByteArray();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        return ImageIO.read(inputStream);
+        } catch (Exception e) {
 
+            return Optional.empty();
+
+        }
+        
     }
 
     /**
@@ -40,15 +41,19 @@ public class ImageResizerHelpers {
      * @param base64Image: The base64 string to be decoded.
      * @return: The decoded image as a BufferedImage object.
      */
-    public static BufferedImage decodeBase64ToImage(String base64Image) throws Exception {
+    public static Optional<BufferedImage> decodeBase64ToImage(String base64Image) {
 
-        byte[] decodedImage = Base64.getDecoder().decode(base64Image);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(decodedImage);
+        try {
 
-        BufferedImage image = ImageIO.read(inputStream);
-        inputStream.close();
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
+            return Optional.of(ImageIO.read(inputStream));
 
-        return image;
+        } catch (Exception e) {
+
+            return Optional.empty();
+
+        }
 
     }
 
