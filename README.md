@@ -9,14 +9,8 @@ deployment.
 
 - 🖼️ Image resizing through a simple REST API
 - 📚 API documentation using Springdoc
-- ⚡ AWS Lambda for serverless function execution
-- 🛡️ AWS API Gateway for managing and securing the API
 - 🗄️ AWS S3 for storing and retrieving images
 - 📦 AWS DynamoDB for storing image metadata
-- 🏗️ Infrastructure setup and management with Terraform
-- 🚦 Separate main and development stages
-- 🔄 Automated deployment workflows
-- 🐳 Docker containerization for consistent environment management
 
 ## Architecture
 
