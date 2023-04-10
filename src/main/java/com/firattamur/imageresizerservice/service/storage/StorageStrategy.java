@@ -11,7 +11,7 @@ public interface StorageStrategy<T> {
      * @param image
      * @return url of the uploaded image
      */
-    String uploadImage(String key, T image) throws Exception;
+    String uploadImage(String key, T image, String format) throws Exception;
 
     /**
      * Downloads an image from the storage

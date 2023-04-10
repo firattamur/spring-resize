@@ -2,6 +2,7 @@ package com.firattamur.imageresizerservice.service;
 
 import com.firattamur.imageresizerservice.dto.ResizeImageRequest;
 import com.firattamur.imageresizerservice.dto.ResizeImageResponse;
+import com.firattamur.imageresizerservice.dto.UploadImageResponse;
 import com.firattamur.imageresizerservice.entity.ImageDynamoDBEntity;
 import com.firattamur.imageresizerservice.exception.InvalidImageFormatException;
 import com.firattamur.imageresizerservice.helper.image.converter.ImageConverter;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -47,30 +49,26 @@ public class ImageResizerService {
 
         try {
 
-            // Download original image from s3 bucket
-            byte[] originalImage = this.storageHandler.download(resizeImageRequest.getImageUrl())
+            byte[] originalImage = this.storageHandler.download(resizeImageRequest.getImageKey())
                     .orElseThrow(() -> new InvalidImageFormatException("Invalid image format in request body."));
 
-            // Get dynamoDB entity
-            ImageDynamoDBEntity imageDynamoDBEntity = this.dynamoDatabaseStrategy.getRecordById(resizeImageRequest.getImageUrl())
+            ImageDynamoDBEntity imageDynamoDBEntity = this.dynamoDatabaseStrategy.getRecordById(resizeImageRequest.getImageId())
                     .orElseThrow(() -> new InvalidImageFormatException("Invalid image format in request body."));
 
-            // Resize the image
             byte[] resizedImage = this.imageResizer.resizeImage(originalImage, imageDynamoDBEntity.getFileType(), resizeImageRequest.getWidth(), resizeImageRequest.getHeight(), resizeImageRequest.isAspectRatio())
                     .orElseThrow(() -> new InvalidImageFormatException("Invalid image format in request body."));
 
-            // upload resized image to s3 bucket
-            String resizedImageUrl = this.storageHandler.uploadImage(UUID.randomUUID().toString(), resizedImage);
+            String resizedImageKey = "resized/" + resizeImageRequest.getImageId() + "_" + resizeImageRequest.getWidth() + "x" + resizeImageRequest.getHeight() + "." + imageDynamoDBEntity.getFileType();
 
-            // update dynamoDB entity
+            String resizedImageUrl = this.storageHandler.uploadImage(resizedImageKey, resizedImage, imageDynamoDBEntity.getFileType());
+
             imageDynamoDBEntity.setDimensionsResizedImage(resizeImageRequest.getWidth() + "x" + resizeImageRequest.getHeight());
             imageDynamoDBEntity.setCreatedAt((int) System.currentTimeMillis());
             imageDynamoDBEntity.setUrlResizedImage(resizedImageUrl);
 
-            // save dynamoDB entity
             this.dynamoDatabaseStrategy.updateRecord(imageDynamoDBEntity);
 
-            return new ResizeImageResponse(resizeImageRequest.getImageUrl(), resizedImageUrl);
+            return new ResizeImageResponse(resizedImageUrl, imageDynamoDBEntity.getUrlOriginalImage());
 
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -86,27 +84,27 @@ public class ImageResizerService {
      * @param image is the image file
      * @return ResponseEntity<ResizeImageResponse>
      */
-    public ResizeImageResponse uploadImage(MultipartFile image) throws Exception {
+    public UploadImageResponse uploadImage(MultipartFile image) throws Exception {
 
         try {
 
-            // Generate unique key for image
-            String imageKey = this.generateUniqueKey();
+            String imageId = UUID.randomUUID().toString();
+            String imageFormat = this.getImageFormat(image)
+                    .orElseThrow(() -> new InvalidImageFormatException("Invalid image format in request body."));
 
-            // Upload the image to s3 bucket
-            String imageUrl = this.storageHandler.uploadImage(imageKey, image.getBytes());
+            String imageKey = "original/" + imageId + "." + imageFormat;
 
-            // Store metadata of image in DynamoDB
+            String imageUrl = this.storageHandler.uploadImage(imageKey, image.getBytes(), imageFormat);
+
             ImageDynamoDBEntity imageDynamoDBEntity = ImageDynamoDBEntity.builder()
-                    .id(imageKey)
+                    .id(imageId)
                     .urlOriginalImage(imageUrl)
-                    .fileType(image.getContentType())
+                    .fileType(imageFormat)
                     .build();
 
             this.dynamoDatabaseStrategy.createRecord(imageDynamoDBEntity);
 
-            // Return the url of original image
-            return new ResizeImageResponse(null, imageUrl);
+            return new UploadImageResponse(imageId, imageKey);
 
         } catch (Exception e) {
 
@@ -117,12 +115,19 @@ public class ImageResizerService {
     }
 
     /**
-     * This method generates a unique key for the image.
+     * This method returns the format of the image.
      *
-     * @return: The unique key.
+     * @param image is the image to be converted.
+     * @return: The format of the image.
      */
-    private String generateUniqueKey() {
-        return UUID.randomUUID().toString();
+    private Optional<String> getImageFormat(MultipartFile image) {
+
+        if (image.getContentType() == null) {
+            return Optional.empty();
+        }
+
+        return image.getContentType().split("/").length > 1 ? Optional.of(image.getContentType().split("/")[1]) : Optional.empty();
+
     }
 
 }

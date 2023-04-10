@@ -11,7 +11,6 @@ public class EnvironmentVariables {
     private final String AWS_ACCESS_KEY;
     private final String AWS_S3_BUCKET_NAME;
 
-
     private EnvironmentVariables() {
 
         Dotenv dotenv = Dotenv.load();

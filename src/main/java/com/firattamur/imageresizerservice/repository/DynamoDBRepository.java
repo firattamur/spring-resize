@@ -38,8 +38,16 @@ public class DynamoDBRepository<T> implements DatabaseStrategy<T> {
 
     @Override
     public Optional<T> getRecordById(String id) {
+
         Key key = Key.builder().partitionValue(id).build();
-        return (Optional<T>) getDynamoDbTable().getItem(key);
+
+        try {
+            T item = getDynamoDbTable().getItem(r -> r.key(key));
+            return Optional.ofNullable(item);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+
     }
 
     @Override
@@ -115,9 +123,8 @@ public class DynamoDBRepository<T> implements DatabaseStrategy<T> {
 
     private DynamoDbTable<T> getDynamoDbTable() {
 
-        DynamoDbTable<T> dynamoDbTable = dynamoDbEnhancedClient.table(this.entityClass.getSimpleName(),
+        return dynamoDbEnhancedClient.table(this.entityClass.getSimpleName(),
                 TableSchema.fromBean(this.entityClass));
-        return dynamoDbTable;
 
     }
 

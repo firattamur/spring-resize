@@ -1,21 +1,27 @@
 package com.firattamur.imageresizerservice.service.storage;
 
-import java.awt.image.BufferedImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.awt.image.BufferedImage;
+import java.util.Optional;
+
+@Service
 public class ImageStorageHandler {
 
     private final StorageStrategy storageStrategy;
 
+    @Autowired
     public ImageStorageHandler(StorageStrategy storageStrategy) {
         this.storageStrategy = storageStrategy;
     }
 
-    public String uploadImage(String key, BufferedImage image) throws Exception {
-        return storageStrategy.uploadImage(key, image);
+    public String uploadImage(String key, BufferedImage image, String format) throws Exception {
+        return storageStrategy.uploadImage(key, image, format);
     }
 
-    public BufferedImage download(String key) {
-        return (BufferedImage) storageStrategy.download(key);
+    public Optional<BufferedImage> download(String key) {
+        return storageStrategy.download(key);
     }
 
     public Boolean delete(String key) {

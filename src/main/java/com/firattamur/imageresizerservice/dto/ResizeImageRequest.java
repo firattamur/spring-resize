@@ -12,7 +12,11 @@ public class ResizeImageRequest {
 
     @NotEmpty
     @NotBlank
-    private String imageUrl;
+    private String imageId;
+
+    @NotEmpty
+    @NotBlank
+    private String imageKey;
 
     @NotEmpty
     @NotBlank

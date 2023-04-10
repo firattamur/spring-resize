@@ -24,5 +24,5 @@ public interface ImageConverter<T> {
      * @return: The converted image as a byte array.
      */
     Optional<byte[]> fromImageToByteArray(T image, String format);
-
+    
 }

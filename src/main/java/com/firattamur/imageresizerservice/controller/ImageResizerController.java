@@ -2,12 +2,10 @@ package com.firattamur.imageresizerservice.controller;
 
 import com.firattamur.imageresizerservice.dto.ResizeImageRequest;
 import com.firattamur.imageresizerservice.dto.ResizeImageResponse;
+import com.firattamur.imageresizerservice.dto.UploadImageResponse;
 import com.firattamur.imageresizerservice.service.ImageResizerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -27,7 +25,7 @@ public class ImageResizerController {
      * Store metadata of image in DynamoDB.
      * Returns the url of resized and original image.
      *
-     * @param resizeImageRequest
+     * @param resizeImageRequest is the request body
      * @return ResponseEntity<ResizeImageResponse>
      */
     @PostMapping("/resize")
@@ -45,8 +43,8 @@ public class ImageResizerController {
      * @param image is the image file
      * @return ResponseEntity<ResizeImageResponse>
      */
-    @PostMapping("/upload-image")
-    public ResizeImageResponse uploadImage(@RequestParam("imageFile") MultipartFile image) throws Exception {
+    @RequestMapping(path = "/upload", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    public UploadImageResponse uploadImage(@RequestParam("imageFile") MultipartFile image) throws Exception {
 
         return this.imageResizerService.uploadImage(image);
 
