@@ -1,29 +1,27 @@
 package com.firattamur.imageresizerservice.service.storage;
 
 import com.firattamur.imageresizerservice.config.EnvironmentVariables;
-import com.firattamur.imageresizerservice.helper.ImageResizerHelpers;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
-import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 
-public class S3StorageStrategy implements StorageStrategy<BufferedImage> {
+public class S3StorageStrategy implements StorageStrategy<byte[]> {
 
     private final S3Client s3Client;
-    private final String bucketName = EnvironmentVariables.AWS_S3_BUCKET_NAME;
+    private final String bucketName = EnvironmentVariables.getInstance().getAwsS3BucketName();
 
     public S3StorageStrategy(S3Client s3Client) {
         this.s3Client = s3Client;
     }
 
     @Override
-    public String uploadImage(String key, BufferedImage image) throws Exception {
+    public String uploadImage(String key, byte[] imageBytes) throws Exception {
 
-        byte[] imageBytes = ImageResizerHelpers.convertImageToByteArray(image, "jpeg");
         SdkBytes sdkBytes = SdkBytes.fromByteArray(imageBytes);
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -40,8 +38,8 @@ public class S3StorageStrategy implements StorageStrategy<BufferedImage> {
     }
 
     @Override
-    public BufferedImage download(String key) {
-        return null;
+    public Optional<byte[]> download(String key) {
+        return Optional.empty();
     }
 
     @Override

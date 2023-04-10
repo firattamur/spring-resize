@@ -6,19 +6,16 @@ import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
-public class DynamoDatabaseStrategy<T> implements DatabaseStrategy<T> {
+public class DynamoDBRepository<T> implements DatabaseStrategy<T> {
 
     private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
     private final Class<T> entityClass;
 
-    public DynamoDatabaseStrategy(DynamoDbEnhancedClient dynamoDbEnhancedClient, Class<T> entityClass) {
+    public DynamoDBRepository(DynamoDbEnhancedClient dynamoDbEnhancedClient, Class<T> entityClass) {
         this.dynamoDbEnhancedClient = dynamoDbEnhancedClient;
         this.entityClass = entityClass;
     }
@@ -40,9 +37,9 @@ public class DynamoDatabaseStrategy<T> implements DatabaseStrategy<T> {
     }
 
     @Override
-    public T getRecordById(String id) {
+    public Optional<T> getRecordById(String id) {
         Key key = Key.builder().partitionValue(id).build();
-        return getDynamoDbTable().getItem(key);
+        return (Optional<T>) getDynamoDbTable().getItem(key);
     }
 
     @Override

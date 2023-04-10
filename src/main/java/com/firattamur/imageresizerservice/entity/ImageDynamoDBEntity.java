@@ -1,11 +1,13 @@
 package com.firattamur.imageresizerservice.entity;
 
+import lombok.Builder;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
 
 @DynamoDbBean
+@Builder
 public class ImageDynamoDBEntity {
 
     private String id;

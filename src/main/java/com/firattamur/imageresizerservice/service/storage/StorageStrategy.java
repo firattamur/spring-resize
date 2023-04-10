@@ -1,5 +1,7 @@
 package com.firattamur.imageresizerservice.service.storage;
 
+import java.util.Optional;
+
 public interface StorageStrategy<T> {
 
     /**
@@ -17,7 +19,7 @@ public interface StorageStrategy<T> {
      * @param key
      * @return image as BufferedImage
      */
-    T download(String key);
+    Optional<T> download(String key);
 
     /**
      * Deletes an image from the storage

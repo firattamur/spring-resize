@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class ImageRepository {
@@ -29,7 +30,7 @@ public class ImageRepository {
         databaseStrategy.deleteRecord(record);
     }
 
-    public ImageDynamoDBEntity getRecordById(String id) {
+    public Optional<ImageDynamoDBEntity> getRecordById(String id) {
         return databaseStrategy.getRecordById(id);
     }
 

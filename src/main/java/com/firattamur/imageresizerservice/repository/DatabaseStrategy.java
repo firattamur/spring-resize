@@ -2,6 +2,7 @@ package com.firattamur.imageresizerservice.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface DatabaseStrategy<T> {
 
@@ -32,7 +33,7 @@ public interface DatabaseStrategy<T> {
      * @param id
      * @return
      */
-    T getRecordById(String id);
+    Optional<T> getRecordById(String id);
 
     /**
      * Gets all records from the database

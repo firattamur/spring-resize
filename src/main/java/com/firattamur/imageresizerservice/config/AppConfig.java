@@ -2,7 +2,7 @@ package com.firattamur.imageresizerservice.config;
 
 import com.firattamur.imageresizerservice.entity.ImageDynamoDBEntity;
 import com.firattamur.imageresizerservice.repository.DatabaseStrategy;
-import com.firattamur.imageresizerservice.repository.DynamoDatabaseStrategy;
+import com.firattamur.imageresizerservice.repository.DynamoDBRepository;
 import com.firattamur.imageresizerservice.service.storage.ImageStorageHandler;
 import com.firattamur.imageresizerservice.service.storage.S3StorageStrategy;
 import com.firattamur.imageresizerservice.service.storage.StorageStrategy;
@@ -46,7 +46,7 @@ public class AppConfig {
     }
 
     @Bean
-    public StorageStrategy<BufferedImage> storageStrategy() {
+    public StorageStrategy<byte[]> storageStrategy() {
         if (useS3()) {
             return new S3StorageStrategy(getS3Client());
         } else {
@@ -57,7 +57,7 @@ public class AppConfig {
     @Bean
     public DatabaseStrategy<ImageDynamoDBEntity> databaseStrategy() {
         if (useDynamoDB()) {
-            return new DynamoDatabaseStrategy<ImageDynamoDBEntity>(getDynamoDbEnhancedClient(), ImageDynamoDBEntity.class);
+            return new DynamoDBRepository<>(getDynamoDbEnhancedClient(), ImageDynamoDBEntity.class);
         } else {
             throw new RuntimeException("No database strategy found");
         }
